@@ -1,4 +1,6 @@
 let TABLE = [];
+let PSEUDO = localStorage.getItem("pseudo");
+let HASBINGO = false;
 const urlParams = new URLSearchParams(window.location.search);
 const debug = urlParams.get("debug");
 
@@ -87,6 +89,11 @@ else {
             i++;
         });
     }
+}
+
+if (PSEUDO === null) {
+    PSEUDO = prompt("Quel est ton pseudo ?");
+    localStorage.setItem("pseudo", PSEUDO);
 }
 
 //Réplique de la fonction random.choice de Python: choisir un élément au hasard dans une liste et le retourner
@@ -188,6 +195,69 @@ function checkBingo() {
 }
 
 function win() {
-    console.log("WIN")
-    document.querySelector(".winDiv").classList.remove("hidden");
+    if (!HASBINGO) {
+        console.log("You won!");
+        HASBINGO = true;
+        document.querySelector(".winDiv").classList.remove("hidden");
+        socket.send(JSON.stringify({
+            "type": "bingo",
+            "pseudo": PSEUDO
+        }));
+    }
 }
+
+function notify(text) {
+    console.log("Showing notification: " + text);
+    document.querySelector(".newDiv").classList.remove("hidden");
+    document.querySelector(".newDiv").textContent = text;
+    setTimeout(() => {
+        document.querySelector(".newDiv").classList.add("hidden");
+    }, 5000);
+}
+
+let socket = new WebSocket("ws://" + document.location.host + "/bingows");
+socket.onopen = () => {
+    console.log("Connected to websocket");
+    socket.send(JSON.stringify({
+        "type": "join",
+        "pseudo": PSEUDO
+    }));
+}
+socket.onmessage = (e) => {
+    let data = JSON.parse(e.data);
+    if (data.type === "bingo") {
+        notify(data.pseudo + " vient de faire un bingo !");
+    }
+    else if (data.type === "join") {
+        notify(data.pseudo + " vient de rejoindre la partie !");
+    }
+    else if (data.type === "reload") {
+        document.location.reload();
+    }
+}
+socket.onerror = (e) => {
+    fetch("/log", {
+        method: "POST",
+        body: JSON.stringify({
+            "message": e,
+            "level": "error"
+        }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+    document.location.reload();
+}
+socket.onclose = (e) => {
+    document.location.reload();
+}
+
+window.onblur = () => {
+    document.title = "Présentation PowerPoint";
+}
+
+window.onfocus = () => {
+    document.title = "Bingolin";
+}
+
+

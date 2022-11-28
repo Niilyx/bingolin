@@ -1,0 +1,23 @@
+{
+  "name": "bingolin",
+  "version": "1.0.0",
+  "description": "Bingo Fridolin",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Niilyx/bingolin.git"
+  },
+  "author": "DocSystem, Niilyx",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Niilyx/bingolin/issues"
+  },
+  "homepage": "https://github.com/Niilyx/bingolin#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-ws": "^5.0.2"
+  }
+}
