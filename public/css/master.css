@@ -1,0 +1,67 @@
+body {
+    font-family: sans-serif;
+    background: #333;
+    color: #ddd;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+table {
+    margin: 0 auto;
+}
+
+tbody {
+    align-self: center;
+}
+
+td {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    border: solid 1px #888;
+    background: #222;
+    color: #eee;
+    cursor: pointer;
+    transition: .1s;
+
+}
+
+.selected {
+    background-color: darkgoldenrod;
+}
+
+button {
+    margin: 20px auto 0;
+    display: block;
+    background: #222;
+    color: #eee;
+    border: solid 1px #888;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: .1s;
+}
+
+button:hover {
+    background: #111;
+}
+
+.winDiv {
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden {
+    display: none;
+}

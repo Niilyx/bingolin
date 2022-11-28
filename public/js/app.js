@@ -1,0 +1,193 @@
+let TABLE = [];
+const urlParams = new URLSearchParams(window.location.search);
+const debug = urlParams.get("debug");
+
+async function getTable() {
+    const response = await fetch("/table");
+    let table = await response.json();
+    table = shuffle(table);
+    let parsedTable = [[],[],[],[],[]];
+    for (let cell in table) {
+        parsedTable[cell % 5].push(table[cell]);
+    }
+    return parsedTable;
+}
+
+function shuffle(array) {
+    let currentIndex = array.length,  randomIndex;
+
+    // While there remain elements to shuffle.
+    while (currentIndex != 0) {
+
+        // Pick a remaining element.
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
+}
+
+function renderTable() {
+    console.log("Rendering table");
+    for (let row of TABLE) {
+        const tr = document.createElement("tr");
+        for (let cell of row) {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            td.onclick = (e) => {
+                if (td.className === "selected") {
+                    td.className = "";
+                    localStorage.setItem("status", JSON.stringify(getBingoStatus()));
+                }
+                else {
+                    td.className = "selected";
+                    localStorage.setItem("status", JSON.stringify(getBingoStatus()));
+                    checkBingo();
+                }
+            }
+            tr.appendChild(td);
+        }
+        document.querySelector("tbody").appendChild(tr);
+    }
+}
+
+// resets page to default state if in debug mode
+if (debug === "1") {
+    localStorage.clear();
+}
+
+if (localStorage.getItem("table") === null) {
+    getTable().then(table => {
+        localStorage.setItem("table", JSON.stringify(table));
+        TABLE = table;
+        console.log("Table loaded from server");
+        renderTable();
+    });
+}
+else {
+    TABLE = JSON.parse(localStorage.getItem("table"));
+    console.log("Table loaded from local storage");
+    renderTable();
+    let status = JSON.parse(localStorage.getItem("status"));
+    if (status !== null) {
+        // On remet les cases cochées
+        let i = 0;
+        document.querySelectorAll("tr").forEach(row => {
+            let j = 0;
+            row.querySelectorAll("td").forEach(cell => {
+                if (status[i][j] === 1) {
+                    cell.className = "selected";
+                }
+                j++;
+            });
+            i++;
+        });
+    }
+}
+
+//Réplique de la fonction random.choice de Python: choisir un élément au hasard dans une liste et le retourner
+function choice(choices) {
+    /* Array -> any
+    Hyp: liste non vide
+    */
+    let index = Math.floor(Math.random() * choices.length);
+    return choices[index];
+}
+
+function getBingoStatus() {
+    let selected = [];
+    document.querySelectorAll("tr").forEach(row => {
+        selected.push([])
+        row.querySelectorAll("td").forEach(cell => {
+            if (cell.className === "selected") {
+                selected[selected.length - 1].push(1);
+            }
+            else {
+                selected[selected.length - 1].push(0);
+            }
+        })
+    });
+    return selected;
+}
+
+function checkBingo() {
+    let cells = getBingoStatus();
+    // selected est une matrice 5x5 contenant des 0 et des 1 selon si la case est cochée ou non
+
+    for (let i=0;i<5;i++) {
+        let line = [];
+        for (let j of cells[i]) {
+            if (j === 1) {
+                line.push(j)
+            }
+        }
+        if (new Set(line).size === 1 && line.length === 5) {
+            win();
+            return
+        }
+    }
+
+    for (let i=0;i<5;i++) {
+        let line = []
+        for (let j=0;j<5;j++) {
+            if (cells[j][i] === 1) {
+                line.push(cells[j][i])
+            }
+        }
+        if (new Set(line).size === 1 && line.length === 5) {
+            win();
+            return
+        }
+    }
+
+    /*for (let i=0;i<5;i++) {
+        let line = []
+        for (let j=4; j>=0; j--) {
+            if (cells[i][j] === 1) {
+                line.push(cells[i][j])
+            }
+        }
+        if (new Set(line).size === 1 && line.length === 5) {
+            win();
+            return
+        }
+    }*/
+
+    for (let i=0;i<5;i++) {
+        for (let j=0;j<5;j++) {
+            if (i === j) {
+                let line = []
+                for (let k=0;k<5;k++) {
+                    if (cells[k][k] === 1) {
+                        line.push(cells[k][k])
+                    }
+                }
+                if (new Set(line).size === 1 && line.length === 5) {
+                    win();
+                    return
+                }
+            }
+            else if (i + j === 4) {
+                let line = []
+                for (let k=0;k<5;k++) {
+                    if (cells[k][4-k] === 1) {
+                        line.push(cells[k][4-k])
+                    }
+                }
+                if (new Set(line).size === 1 && line.length === 5) {
+                    win();
+                    return
+                }
+            }
+        }
+    }
+}
+
+function win() {
+    console.log("WIN")
+    document.querySelector(".winDiv").classList.remove("hidden");
+}
