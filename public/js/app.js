@@ -215,7 +215,14 @@ function notify(text) {
     }, 5000);
 }
 
-let socket = new WebSocket("ws://" + document.location.host + "/bingows");
+let socketurl = "";
+if (location.protocol === "https:") {
+    socketurl = "wss://" + document.location.host + "/bingows";
+}
+else {
+    socketurl = "ws://" + document.location.host + "/bingows";
+}
+let socket = new WebSocket(socketurl);
 socket.onopen = () => {
     console.log("Connected to websocket");
     socket.send(JSON.stringify({
