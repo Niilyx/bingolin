@@ -252,7 +252,10 @@ socket.onmessage = (e) => {
         }, 1000);
     }
     else if (data.type === "reload") {
-        document.location.reload();
+        window.location.href = window.location.href;
+    }
+    else {
+        console.log(data);
     }
 }
 socket.onerror = (e) => {
@@ -268,13 +271,13 @@ socket.onerror = (e) => {
     });
     notify("Une erreur est survenue, rechargement de la page...");
     setTimeout(() => {
-        document.location.reload();
+        window.location.href = window.location.href;
     }, 1000);
 }
 socket.onclose = (e) => {
     notify("Le serveur a redémarré, rechargement de la page...");
     setTimeout(() => {
-        document.location.reload();
+        window.location.href = window.location.href;
     }, 1000);
 }
 

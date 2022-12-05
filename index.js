@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 80;
-var expressWs = require('express-ws')(app);
+require('express-ws')(app);
 const bodyParser = require("body-parser");
 
 let SOCKETS = [];
@@ -66,6 +66,39 @@ app.ws("/bingows", (ws, req) => {
         ws.close();
     });
 })
+
+process.stdin.on("data", (data) => {
+    let msg = data.toString().trim();
+    if (msg === "/newgame") {
+        console.log("Une nouvelle partie va commencer !");
+        broadcast({
+            type: "newgame"
+        });
+    }
+    else if (msg === "/reload") {
+        console.log("Reloading all clients...");
+        broadcast({
+            type: "reload"
+        });
+    }
+    else if (msg.startsWith("/notify ")) {
+        console.log("Sending notification: " + msg.substring(8));
+        broadcast({
+            type: "notify",
+            text: msg.substring(8)
+        });
+    }
+    else if (msg === "/help") {
+        console.log("Available commands:");
+        console.log("/newgame: starts a new game");
+        console.log("/reload: reloads all clients");
+        console.log("/notify <text>: sends a notification to all clients");
+    }
+    else {
+        console.log("Unknown command: " + msg);
+        console.log("Type /help to get a list of commands");
+    }
+});
 
 app.listen(port, () => {
     console.log(`Bingolin app listening at http://localhost:${port}`);
