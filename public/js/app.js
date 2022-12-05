@@ -91,8 +91,8 @@ else {
     }
 }
 
-if (PSEUDO === null) {
-    PSEUDO = prompt("Quel est ton pseudo ?");
+if (PSEUDO === null || PSEUDO.trim() === "") {
+    PSEUDO = prompt("Quel est ton pseudo ?").trim();
     localStorage.setItem("pseudo", PSEUDO);
 }
 
@@ -238,6 +238,19 @@ socket.onmessage = (e) => {
     else if (data.type === "join") {
         notify(data.pseudo + " vient de rejoindre la partie !");
     }
+    else if (data.type === "leave") {
+        notify(data.pseudo + " vient de quitter la partie !");
+    }
+    else if (data.type === "notify") {
+        notify(data.text);
+    }
+    else if (data.type === "newgame") {
+        notify("Une nouvelle partie va commencer !");
+        setTimeout(() => {
+            localStorage.clear();
+            document.location.reload();
+        }, 1000);
+    }
     else if (data.type === "reload") {
         document.location.reload();
     }
@@ -253,10 +266,16 @@ socket.onerror = (e) => {
             "Content-Type": "application/json"
         }
     });
-    document.location.reload();
+    notify("Une erreur est survenue, rechargement de la page...");
+    setTimeout(() => {
+        document.location.reload();
+    }, 1000);
 }
 socket.onclose = (e) => {
-    document.location.reload();
+    notify("Le serveur a redémarré, rechargement de la page...");
+    setTimeout(() => {
+        document.location.reload();
+    }, 1000);
 }
 
 window.onblur = () => {

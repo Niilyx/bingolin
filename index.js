@@ -30,6 +30,7 @@ app.post("/log", (req, res) => {
 
 app.ws("/bingows", (ws, req) => {
     SOCKETS.push(ws);
+    let pseudo = "";
     ws.on("message", (msg) => {
         let data = JSON.parse(msg);
         if (data.type === "bingo") {
@@ -40,6 +41,7 @@ app.ws("/bingows", (ws, req) => {
             });
         }
         else if (data.type === "join") {
+            pseudo = data.pseudo;
             console.log(data.pseudo + " vient de rejoindre la partie !");
             broadcast({
                 type: "join",
@@ -54,6 +56,10 @@ app.ws("/bingows", (ws, req) => {
         SOCKETS = SOCKETS.filter((socket) => {
             return socket !== ws;
         });
+        broadcast({
+            type: "leave",
+            pseudo: pseudo
+        })
     });
     ws.on("error", (e) => {
         console.error(e);
