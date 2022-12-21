@@ -3,6 +3,10 @@ let PSEUDO = localStorage.getItem("pseudo");
 let HASBINGO = false;
 const urlParams = new URLSearchParams(window.location.search);
 const debug = urlParams.get("debug");
+const noNameChoice = [
+    "Bourricot obscur",
+    "Goofy ahh",
+];
 
 async function getTable() {
     const response = await fetch("/table");
@@ -91,10 +95,6 @@ else {
     }
 }
 
-if (PSEUDO === null || PSEUDO.trim() === "") {
-    PSEUDO = prompt("Quel est ton pseudo ?").trim();
-    localStorage.setItem("pseudo", PSEUDO);
-}
 
 //Réplique de la fonction random.choice de Python: choisir un élément au hasard dans une liste et le retourner
 function choice(choices) {
@@ -103,6 +103,15 @@ function choice(choices) {
     */
     let index = Math.floor(Math.random() * choices.length);
     return choices[index];
+}
+
+if (PSEUDO === null || PSEUDO.trim() === "") {
+    PSEUDO = prompt("Quel est ton pseudo ?");
+    if (PSEUDO === null || PSEUDO.trim() === "") {
+        PSEUDO = choice(noNameChoice);
+    }
+    PSEUDO = PSEUDO.trim();
+    localStorage.setItem("pseudo", PSEUDO);
 }
 
 function getBingoStatus() {
