@@ -1,3 +1,5 @@
+const FRIDOLIN = "Why are you reading this ? You should be working !";
+
 let TABLE = [];
 let PSEUDO = localStorage.getItem("pseudo");
 let HASBINGO = false;
@@ -23,7 +25,7 @@ function shuffle(array) {
     let currentIndex = array.length,  randomIndex;
 
     // While there remain elements to shuffle.
-    while (currentIndex != 0) {
+    while (currentIndex !== 0) {
 
         // Pick a remaining element.
         randomIndex = Math.floor(Math.random() * currentIndex);
@@ -54,6 +56,7 @@ function renderTable() {
                     localStorage.setItem("status", JSON.stringify(getBingoStatus()));
                     checkBingo();
                 }
+                sendStatus();
             }
             tr.appendChild(td);
         }

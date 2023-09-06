@@ -1,10 +1,13 @@
 const express = require("express");
 const app = express();
+const fs = require("fs");
 const port = 80;
 require('express-ws')(app);
 const bodyParser = require("body-parser");
 
 let SOCKETS = [];
+
+let USERS = [];
 
 // force no cache
 app.use("/", (req, res, next) => {
@@ -19,6 +22,16 @@ function broadcast(data) {
     });
 }
 
+function randomizeArray(arr) {
+    let res = [];
+    while (arr.length > 0) {
+        let i = Math.floor(Math.random() * arr.length);
+        res.push(arr[i]);
+        arr.splice(i, 1);
+    }
+    return res;
+}
+
 function takeOnly25Firsts(arr) {
     let res = [];
     for (let i = 0; i < 25; i++) {
@@ -28,8 +41,8 @@ function takeOnly25Firsts(arr) {
 }
 
 app.get("/table", (req, res) => {
-    const table = require("./table.json");
-    res.json(takeOnly25Firsts(table));
+    const table = JSON.parse(fs.readFileSync("table.json"));
+    res.json(takeOnly25Firsts(randomizeArray(table)));
 });
 
 app.post("/log", (req, res) => {
@@ -55,14 +68,18 @@ app.ws("/bingows", (ws, req) => {
         }
         else if (data.type === "join") {
             pseudo = data.pseudo;
-            console.log(data.pseudo + " vient de rejoindre la partie !");
+            console.log("\033[92m" + data.pseudo + " vient de rejoindre la partie !\033[0m");
+            USERS.push({
+                pseudo: data.pseudo,
+                ip: req.headers["cf-connecting-ip"]
+            });
             broadcast({
                 type: "join",
                 pseudo: data.pseudo
             });
         }
         else if (data.type === "hide") {
-            if (data.password === "CYBN{H3ll0_I'm_4dm1n}") {
+            if (data.password === process.env.ADMIN_PASSWORD) {
                 broadcast({
                     type: "hide",
                     value: data.value
@@ -82,6 +99,10 @@ app.ws("/bingows", (ws, req) => {
     ws.on("close", () => {
         SOCKETS = SOCKETS.filter((socket) => {
             return socket !== ws;
+        });
+        console.log("\033[91m" + pseudo + " vient de quitter la partie !\033[0m");
+        USERS = USERS.filter((user) => {
+            return user.pseudo !== pseudo;
         });
         broadcast({
             type: "leave",
@@ -129,12 +150,21 @@ process.stdin.on("data", (data) => {
             value: false
         });
     }
+    else if (msg === "/list") {
+        console.log("Connected users:");
+        console.log("Pseudo" + " ".repeat(30 - "Pseudo".length) + " | IP");
+        console.log("-".repeat(30) + "-|-" + "-".repeat(15));
+        USERS.forEach((user) => {
+            console.log(user.pseudo + " ".repeat(30 - user.pseudo.length) + " | " + user.ip);
+        });
+    }
     else if (msg === "/help") {
         console.log("Available commands:");
         console.log("/newgame: starts a new game");
         console.log("/reload: reloads all clients");
         console.log("/hide <true|false>: hides or shows all clients");
         console.log("/notify <text>: sends a notification to all clients");
+        console.log("/list: lists all connected users");
     }
     else {
         console.log("Unknown command: " + msg);
