@@ -48,6 +48,20 @@ app.ws("/bingows", (ws, req) => {
                 pseudo: data.pseudo
             });
         }
+        else if (data.type === "hide") {
+            if (data.password === "CYBN{H3ll0_I'm_4dm1n}") {
+                broadcast({
+                    type: "hide",
+                    value: data.value
+                });
+            }
+            else {
+                ws.send(JSON.stringify({
+                    type: "notify",
+                    text: "Mot de passe incorrect"
+                }));
+            }
+        }
         else {
             console.log("Unknown message type: " + data.type);
         }
@@ -88,10 +102,25 @@ process.stdin.on("data", (data) => {
             text: msg.substring(8)
         });
     }
+    else if (msg === "/hide true") {
+        console.log("Hiding all clients...");
+        broadcast({
+            type: "hide",
+            value: true
+        });
+    }
+    else if (msg === "/hide false") {
+        console.log("Showing all clients...");
+        broadcast({
+            type: "hide",
+            value: false
+        });
+    }
     else if (msg === "/help") {
         console.log("Available commands:");
         console.log("/newgame: starts a new game");
         console.log("/reload: reloads all clients");
+        console.log("/hide <true|false>: hides or shows all clients");
         console.log("/notify <text>: sends a notification to all clients");
     }
     else {
