@@ -6,7 +6,11 @@ const bodyParser = require("body-parser");
 
 let SOCKETS = [];
 
-app.use("/", express.static("public"));
+// force no cache
+app.use("/", (req, res, next) => {
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+    next();
+}, express.static("public"));
 app.use(bodyParser.json());
 
 function broadcast(data) {
