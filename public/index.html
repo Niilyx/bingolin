@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8">
         <title>Bingolin</title>
-        <link rel="stylesheet" href="/css/master.css?_t=1693983042">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
@@ -13,7 +12,15 @@
             <tbody></tbody>
         </table>
         <button onclick="localStorage.clear(); document.location.reload();">Nouvelle partie</button>
-        <script src="/js/app.js?_t=1693983042"></script>
+        <script>
+            const style = document.createElement('link');
+            style.rel = 'stylesheet';
+            style.href = '/css/master.css' + '?v=' + Date.now();
+            document.head.appendChild(style);
+            const script = document.createElement('script');
+            script.src = '/js/app.js' + '?v=' + Date.now();
+            document.body.appendChild(script);
+        </script>
         <div class="winDiv hidden" onclick="document.querySelector('.winDiv').classList.add('hidden')">
             <h1>BINGO !!!</h1>
             <p>Cliquez n'importe où pour continuer</p>
