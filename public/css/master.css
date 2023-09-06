@@ -76,6 +76,19 @@ button:hover {
     border-radius: 4px;
 }
 
+.hider {
+    position: fixed;
+    top: 0;
+    left: 40px;
+    width: calc(100vw - 80px);
+    height: 100vh;
+    background-image: url(/img/discret.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    z-index: 100;
+}
+
 
 .hidden {
     display: none;

@@ -263,6 +263,14 @@ socket.onmessage = (e) => {
     else if (data.type === "reload") {
         window.location.href = window.location.href;
     }
+    else if (data.type === "hide") {
+        if (data.value) {
+            document.querySelector(".hider").classList.remove("hidden");
+        }
+        else {
+            document.querySelector(".hider").classList.add("hidden");
+        }
+    }
     else {
         console.log(data);
     }

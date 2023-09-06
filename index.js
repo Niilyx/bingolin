@@ -15,8 +15,17 @@ function broadcast(data) {
     });
 }
 
+function takeOnly25Firsts(arr) {
+    let res = [];
+    for (let i = 0; i < 25; i++) {
+        res.push(arr[i]);
+    }
+    return res;
+}
+
 app.get("/table", (req, res) => {
-    res.sendFile(__dirname + "/table.json");
+    const table = require("./table.json");
+    res.json(takeOnly25Firsts(table));
 });
 
 app.post("/log", (req, res) => {
