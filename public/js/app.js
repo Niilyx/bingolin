@@ -114,6 +114,12 @@ if (PSEUDO === null || PSEUDO.trim() === "") {
     localStorage.setItem("pseudo", PSEUDO);
 }
 
+if (PSEUDO === "DocSystem") {
+    if (localStorage.getItem("password") === null) {
+        localStorage.setItem("password", prompt("Quel est le mot de passe ?"));
+    }
+}
+
 function getBingoStatus() {
     let selected = [];
     document.querySelectorAll("tr").forEach(row => {
@@ -306,4 +312,23 @@ window.onfocus = () => {
     document.title = "Bingolin";
 }
 
-
+document.onkeydown = (e) => {
+    if (e.key === "h") {
+        if (localStorage.getItem("password") === null) {
+            return;
+        }
+        if (document.querySelector(".hider").classList.contains("hidden")) {
+            socket.send(JSON.stringify({
+                "type": "hide",
+                "password": localStorage.getItem("password"),
+                "value": true
+            }));
+        } else {
+            socket.send(JSON.stringify({
+                "type": "hide",
+                "password": localStorage.getItem("password"),
+                "value": false
+            }));
+        }
+    }
+}
