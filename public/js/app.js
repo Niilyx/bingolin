@@ -261,7 +261,7 @@ socket.onmessage = (e) => {
         }, 1000);
     }
     else if (data.type === "reload") {
-        window.location.href = window.location.href;
+        window.location.reload();
     }
     else if (data.type === "hide") {
         if (data.value) {
